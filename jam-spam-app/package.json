@@ -2,7 +2,7 @@
   "name": "jam-spam-app",
   "version": "1.0.0",
   "private": true,
-  "description": "A GitHub App that jams spam PRs away from repos so that maintainers can stay calm (even in Hacktober 🎃)",
+  "description": "A Machine Learning powered GitHub App to jam the spam PRs on your repo and keep maintainers stress-free (even in Hacktober 🎃)",
   "author": "Ajwad Shaikh & Vrushti Mody <fellowship@mlh.io>",
   "license": "ISC",
   "repository": "https://github.com/MLH-Fellowship/JamSpam.git",
