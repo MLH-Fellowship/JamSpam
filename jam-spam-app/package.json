@@ -1,0 +1,31 @@
+{
+  "name": "jam-spam-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A GitHub App that jams spam PRs away from repos so that maintainers can stay calm (even in Hacktober 🎃)",
+  "author": "Ajwad Shaikh & Vrushti Mody <fellowship@mlh.io>",
+  "license": "ISC",
+  "repository": "https://github.com/MLH-Fellowship/JamSpam.git",
+  "homepage": "https://github.com/MLH-Fellowship/JamSpam",
+  "bugs": "https://github.com/MLH-Fellowship/JamSpam/issues",
+  "keywords": [
+    "probot",
+    "github",
+    "probot-app"
+  ],
+  "scripts": {
+    "start": "probot run ./index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "probot": "^10.9.3"
+  },
+  "devDependencies": {
+    "jest": "^26.4.0",
+    "nock": "^13.0.4",
+    "smee-client": "^1.1.0"
+  },
+  "engines": {
+    "node": ">= 10.13.0"
+  }
+}
