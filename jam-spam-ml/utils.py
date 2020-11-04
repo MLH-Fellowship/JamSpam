@@ -1,8 +1,11 @@
 from octokit import Octokit
-import csv, requests
+import csv, requests, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-def fetch_data_from_github(pull_request: str) -> list:
+def fetch_data_from_github(pull_request: str) -> dict:
     """Takes a pull-request link and returns a feature array for it
 
     Parameters
@@ -12,24 +15,61 @@ def fetch_data_from_github(pull_request: str) -> list:
     
     Returns
     -------
-    list
-        The feature array contains four parameters and looks like [pr_title, pr_body, pr_diffs, pr_commits]
-        pr_title: str -> title of the PR
-        pr_body: str -> body of the PR
-        pr_diffs: str -> aggregated diffs of the PR
-        pr_commits: list -> list of commit messages: str
+    dict
+        The feature dict contains parameters fetched from GitHub required to build training model
     """
-    
+
     pr_attrs = pull_request.split('/')
     # ['https:', '', 'github.com', 'owner', 'repo', 'pull', 'pull_number']
-    pr_data = Octokit().pulls.get(
-        owner=pr_attrs[3], repo=pr_attrs[4], pull_number=int(pr_attrs[6]))
+    octokit = Octokit(auth='token', token=os.getenv("TOKEN"))
+    # octokit = Octokit()
+    pr_data = octokit.pulls.get(owner=pr_attrs[3],
+                                repo=pr_attrs[4],
+                                pull_number=int(pr_attrs[6]))
     commits = requests.get(pr_data.json["commits_url"]).json()
     commit_messages = []
+    number_of_commits = pr_data.json["commits"]
+    number_of_changes = pr_data.json["additions"] + pr_data.json["deletions"]
+    number_of_files_changed = pr_data.json["changed_files"]
     for commit_object in commits:
         commit_messages.append(commit_object['commit']['message'])
     diffs = requests.get(pr_data.json["diff_url"]).text
-    return [pr_data.json["title"], pr_data.json["body"], diffs, commit_messages]
+    number_of_docs_changed = get_docs_changed(diffs)
+    return {
+        "title": pr_data.json["title"],
+        # "body": pr_data.json["body"],
+        # "diffs": diffs,
+        "commit_messages": commit_messages,
+        "files_changed": number_of_files_changed,
+        "docs_changed": number_of_docs_changed,
+        "commits": number_of_commits,
+        "changes": number_of_changes
+    }
+
+
+def get_docs_changed(diffs: str) -> int:
+    """Processes diffs from a Pull Request to extract number of doc-type files changed in the PR
+
+    Parameters
+    ----------
+    diffs : str
+        A string denoting the diffs in the PR
+
+    Returns
+    -------
+    int
+        number of files of documentation type that have been changed in the PR
+    
+    """
+
+    # Documentation-type file extensions
+    exts = ['md', 'txt', 'rst', '']
+    diff_set = [
+        line for line in diffs.split('\n')
+        if line.startswith('diff') and line.split('.')[-1] in exts
+    ]
+    return len(diff_set)
+
 
 def read_csv(file_path: str) -> list:
     """Takes a filepath returns a data with list of PR links from CSV data file
