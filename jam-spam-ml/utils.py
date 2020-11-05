@@ -26,12 +26,14 @@ def fetch_data_from_github(pull_request: str) -> dict:
     pr_data = octokit.pulls.get(owner=pr_attrs[3],
                                 repo=pr_attrs[4],
                                 pull_number=int(pr_attrs[6]))
-    commits = requests.get(pr_data.json["commits_url"]).json()
+    commits = octokit.pulls.list_commits(owner=pr_attrs[3],
+                                        repo=pr_attrs[4],
+                                        pull_number=int(pr_attrs[6]))
     commit_messages = []
     number_of_commits = pr_data.json["commits"]
     number_of_changes = pr_data.json["additions"] + pr_data.json["deletions"]
     number_of_files_changed = pr_data.json["changed_files"]
-    for commit_object in commits:
+    for commit_object in commits.json:
         commit_messages.append(commit_object['commit']['message'])
     diffs = requests.get(pr_data.json["diff_url"]).text
     number_of_docs_changed = get_docs_changed(diffs)

@@ -15,13 +15,11 @@ def main():
     ]
 
     spam_text_corpus = [[
-        pr_feature["title"], pr_feature["body"], pr_feature["diffs"],
-        pr_feature["commit_messages"]
+        pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
     ] for pr_feature in spam_feature_array]
 
     ham_text_corpus = [[
-        pr_feature["title"], pr_feature["body"], pr_feature["diffs"],
-        pr_feature["commit_messages"]
+        pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
     ] for pr_feature in ham_feature_array]
 
     spam_keywords = get_spam_keywords(spam_text_corpus, ham_text_corpus)
