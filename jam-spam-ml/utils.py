@@ -37,8 +37,8 @@ def fetch_data_from_github(pull_request: str) -> dict:
     number_of_docs_changed = get_docs_changed(diffs)
     return {
         "title": pr_data.json["title"],
-        # "body": pr_data.json["body"],
-        # "diffs": diffs,
+        "body": pr_data.json["body"],
+        "diffs": diffs,
         "commit_messages": commit_messages,
         "files_changed": number_of_files_changed,
         "docs_changed": number_of_docs_changed,
