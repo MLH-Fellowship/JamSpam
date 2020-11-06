@@ -1,5 +1,7 @@
 from __future__ import division
 from utils import read_csv, fetch_data_from_github
+from spam_keywords import get_spam_keywords
+
 import tensorflow as tf
 import numpy as np
 import tarfile
@@ -17,14 +19,22 @@ def main():
         SPAM_PRS = read_csv("data/spam.csv")
         HAM_PRS = read_csv("data/ham.csv")
 
-        spam_feature_array = [fetch_data_from_github(pr_link) for pr_link in SPAM_PRS]
-        ham_feature_array = [fetch_data_from_github(pr_link) for pr_link in HAM_PRS]
+        spam_feature_array = [
+            fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[10:15]
+        ]
+        ham_feature_array = [
+            fetch_data_from_github(pr_link) for pr_link in HAM_PRS[10:15]
+        ]
 
-        print("SPAM: ")
-        print(spam_feature_array)
+        spam_text_corpus = [[
+            pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
+        ] for pr_feature in spam_feature_array]
 
-        print("HAM: ")
-        print(ham_feature_array)
+        ham_text_corpus = [[
+            pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
+        ] for pr_feature in ham_feature_array]
+
+        spam_keywords = get_spam_keywords(spam_text_corpus, ham_text_corpus)
 
         print("loading training data")
         # trainX = csv_to_numpy_array("data/trainX.csv", delimiter="\t")
@@ -205,6 +215,7 @@ def main():
     #
     # # Close tensorflow session
     # sess.close()
+
 
 if __name__ == "__main__":
     main()
