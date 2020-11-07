@@ -12,7 +12,7 @@ def fetch_data_from_github(pull_request: str) -> dict:
     ----------
     pull_request : str
         The link to the pull request on GitHub
-    
+
     Returns
     -------
     dict
@@ -38,6 +38,7 @@ def fetch_data_from_github(pull_request: str) -> dict:
     diffs = requests.get(pr_data.json["diff_url"]).text
     number_of_docs_changed = get_docs_changed(diffs)
     return {
+        "url": pull_request,
         "title": pr_data.json["title"],
         "body": pr_data.json["body"],
         "diffs": diffs,
@@ -61,7 +62,7 @@ def get_docs_changed(diffs: str) -> int:
     -------
     int
         number of files of documentation type that have been changed in the PR
-    
+
     """
 
     # Documentation-type file extensions
@@ -75,12 +76,12 @@ def get_docs_changed(diffs: str) -> int:
 
 def read_csv(file_path: str) -> list:
     """Takes a filepath returns a data with list of PR links from CSV data file
-    
+
     Parameters
     ----------
     file_path : str
         The path to the CSV file on your system that contains the list of PR links
-    
+
     Returns
     -------
     list
