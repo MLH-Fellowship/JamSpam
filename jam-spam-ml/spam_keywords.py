@@ -1,4 +1,5 @@
 from multi_rake import Rake;
+import re
 
 text_spam = '' #SPAM TEXT BLOB
 text_ham = ''  #HAM TEXT BLOB
@@ -15,25 +16,32 @@ for i in range (0,len(ham_feature_array)):
     for j in range (0,len(ham_feature_array[i][3])):
         text_ham = text_ham + ham_feature_array[i][3][j]
 
+# CLEAN TEXT
+
+spam_clean =  re.sub('[^a-zA-Z0-9 \n\.]', '', text_spam)
+print(spam_clean)
+ham = re.sub('\W+','', text_ham )
+
 #INITIALISE RAKE FOR POPULAR WORDS
-rake = Rake()
+rake = Rake(max_words=2, min_freq=2)
 
 #EXTRACT POPULAR KEYWORDS FOR SPAM AND HAM
-keywords_spam = rake.apply(text_spam)
+keywords_spam = rake.apply(spam_clean)
 keywords_ham  = rake.apply(text_ham)
 
+print(keywords_spam)
 spam=[]
 ham=[]
 
-#STORE TOP 30 SPAM AND HAM KEYWORDS
-for i in range(0, 30):
-    spam.append(keywords_spam[i][0])
-    ham.append(keywords_ham[i][0])
+# #STORE TOP 30 SPAM AND HAM KEYWORDS
+# for i in range(0, 10):
+#     spam.append(keywords_spam[i][0])
+#     ham.append(keywords_ham[i][0])
 
-# GENERATE KEYWORDS PRESENT IN SPAM WHICH ARE NOT PRESENT IN HAM
-spam_final=[]
-for word in spam:
-    if word not in ham:
-        spam_final.append(word)
+# # GENERATE KEYWORDS PRESENT IN SPAM WHICH ARE NOT PRESENT IN HAM
+# spam_final=[]
+# for word in spam:
+#     if word not in ham:
+#         spam_final.append(word)
 
 
