@@ -57,12 +57,13 @@ def get_spam_keywords(spam_features, ham_features):
 
     text_spam =  re.sub('[^a-zA-Z0-9 \n\.]', '', text_spam)
     text_ham  = re.sub('[^a-zA-Z0-9 \n\.]', '', text_ham)
+    print(text_spam,"\n------------------------------------------\n",text_ham)
     #INITIALISE RAKE FOR POPULAR WORDS
-    rake = Rake(max_words=1, min_freq=2)
+    rake = Rake(max_words=2, min_freq=2)
 
     #EXTRACT POPULAR KEYWORDS FOR SPAM AND HAM
-    keywords_spam = rake.apply(text_spam)
-    keywords_ham = rake.apply(text_ham)
+    keywords_spam = rake.apply(text_spam.lower())
+    keywords_ham = rake.apply(text_ham.lower())
 
     print(keywords_ham, keywords_spam)
 
