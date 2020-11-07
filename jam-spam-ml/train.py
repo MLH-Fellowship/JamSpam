@@ -8,10 +8,10 @@ def main():
     HAM_PRS = read_csv("data/ham.csv")
 
     spam_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[10:15]
+        fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[5:10]
     ]
     ham_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in HAM_PRS[10:15]
+        fetch_data_from_github(pr_link) for pr_link in HAM_PRS[5:10]
     ]
 
     spam_text_corpus = [[

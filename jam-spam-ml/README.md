@@ -20,6 +20,5 @@ pip install -r requirements.txt
 python train.py
 
 # Find the spam keywords
-
 python spam_keywords.py
 ```
