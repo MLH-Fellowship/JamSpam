@@ -14,6 +14,8 @@ source venv/Scripts/activate
 # Install Dependencies
 pip install -r requirements.txt
 
+# Add GitHub Personal Access token to .env file (create a copy from .env.example file and replace YOUR_GITHUB_ACCESS_TOKEN) - allows for higher rate limits on GitHub API 
+
 # Start training
 python train.py
 

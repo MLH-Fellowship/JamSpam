@@ -1,4 +1,4 @@
 octokitpy
-python-csv
+python-dotenv
 requests
 multi-rake
