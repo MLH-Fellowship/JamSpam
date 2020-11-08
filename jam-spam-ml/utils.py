@@ -12,7 +12,7 @@ def fetch_data_from_github(pull_request: str) -> dict:
     ----------
     pull_request : str
         The link to the pull request on GitHub
-    
+
     Returns
     -------
     dict
@@ -38,7 +38,7 @@ def fetch_data_from_github(pull_request: str) -> dict:
             commit_messages += f'{commit_object["commit"]["message"]} '
         diffs = requests.get(pr_data.json["diff_url"]).text
         number_of_docs_changed = get_docs_changed(diffs)
-    
+
         return {
             "url": pull_request,
             "title": pr_data.json["title"],
@@ -65,7 +65,7 @@ def get_docs_changed(diffs: str) -> int:
     -------
     int
         number of files of documentation type that have been changed in the PR
-    
+
     """
 
     # Documentation-type file extensions
@@ -79,12 +79,12 @@ def get_docs_changed(diffs: str) -> int:
 
 def read_csv(file_path: str) -> list:
     """Takes a filepath returns a data with list of PR links from CSV data file
-    
+
     Parameters
     ----------
     file_path : str
         The path to the CSV file on your system that contains the list of PR links
-    
+
     Returns
     -------
     list
@@ -97,13 +97,13 @@ def read_csv(file_path: str) -> list:
         return data
 
 def import_local_dataset() -> (list, list):
-    
+
     spam_data = ham_data = []
 
     maxInt = sys.maxsize
-    
+
     while True:
-    # decrease the maxInt value by factor 10 
+    # decrease the maxInt value by factor 10
     # as long as the OverflowError occurs.
         try:
             csv.field_size_limit(maxInt)
@@ -136,17 +136,17 @@ def fetch_from_remote(updateLocal: bool) -> (list, list):
     ]
 
     spam_list_features = [[
-        pr_feature["url"], pr_feature["title"], pr_feature["body"], pr_feature["diffs"], 
-        pr_feature["commit_messages"], pr_feature["files_changed"], pr_feature["docs_changed"], 
+        pr_feature["url"], pr_feature["title"], pr_feature["body"], pr_feature["diffs"],
+        pr_feature["commit_messages"], pr_feature["files_changed"], pr_feature["docs_changed"],
         pr_feature["commits"], pr_feature["changes"]
     ] for pr_feature in spam_feature_array]
 
     ham_list_features = [[
-        pr_feature["url"], pr_feature["title"], pr_feature["body"], pr_feature["diffs"], 
-        pr_feature["commit_messages"], pr_feature["files_changed"], pr_feature["docs_changed"], 
+        pr_feature["url"], pr_feature["title"], pr_feature["body"], pr_feature["diffs"],
+        pr_feature["commit_messages"], pr_feature["files_changed"], pr_feature["docs_changed"],
         pr_feature["commits"], pr_feature["changes"]
     ] for pr_feature in ham_feature_array]
-    
+
     if updateLocal is True:
         with open("data/spam_fetch.csv", "w", newline='', encoding='utf8') as file:
             writer = csv.writer(file)
@@ -155,5 +155,5 @@ def fetch_from_remote(updateLocal: bool) -> (list, list):
         with open("data/ham_fetch.csv", "w", newline='', encoding='utf8') as file:
             writer = csv.writer(file)
             writer.writerows(ham_list_features)
-    
+
     return spam_feature_array, ham_feature_array
