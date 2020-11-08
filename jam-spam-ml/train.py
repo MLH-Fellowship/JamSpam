@@ -1,6 +1,4 @@
 from __future__ import division
-from collections import Counter
-from multi_rake import Rake
 from utils import read_csv, fetch_data_from_github, import_local_dataset, fetch_from_remote
 from spam_keywords import get_keywords, get_spam_keywords
 
@@ -10,12 +8,34 @@ import tarfile
 import os
 import matplotlib.pyplot as plt
 import time
+import re
 
 def print_array(ys):
     for xs in ys:
         print("[")
         print(", ".join(map(str, xs)))
         print("]")
+
+def count_freq(pat, txt):
+    M = len(pat)
+    N = len(txt)
+    res = 0
+
+    # A loop to slide pat[] one by one
+    for i in range(N - M + 1):
+
+        # For current index i, check
+        # for pattern match
+        j = 0
+        while j < M:
+            if (txt[i + j] != pat[j]):
+                break
+            j += 1
+
+        if (j == M):
+            res += 1
+            j = 0
+    return res
 
 def main():
 
@@ -62,26 +82,18 @@ def main():
             pr_feature[5], pr_feature[6], pr_feature[7], pr_feature[8]]  # [files_changed, docs_changed, commits, changes]
             for pr_feature in ham_data])
 
-        rake = Rake(max_words=1, min_freq=1)
-
         for i in range(len(spam_text_corpus)):
             num_spam_keywords = 0
-            keywords = dict(rake.apply(get_keywords(spam_text_corpus[i]).lower()))
-            # print("COUNTER for", spam_feature_array[i][0])
-            # print(keywords)
-            # print("~~~")
+            text = re.sub('[^a-zA-Z0-9 \n\.]', '', get_keywords(spam_text_corpus[i]).lower())
             for keyword in spam_keywords:
-                if keyword in keywords: num_spam_keywords += keywords[keyword]
+                num_spam_keywords += count_freq(keyword, text)
             spam_feature_array[i].append(num_spam_keywords)
 
         for i in range(len(ham_text_corpus)):
             num_spam_keywords = 0
-            keywords = dict(rake.apply(get_keywords(ham_text_corpus[i]).lower()))
-            # print("COUNTER for", ham_feature_array[i][0])
-            # print(keywords)
-            # print("~~~")
+            text = re.sub('[^a-zA-Z0-9 \n\.]', '', get_keywords(ham_text_corpus[i]).lower())
             for keyword in spam_keywords:
-                if keyword in keywords: num_spam_keywords += keywords[keyword]
+                num_spam_keywords += count_freq(keyword, text)
             ham_feature_array[i].append(num_spam_keywords)
 
         labels_array = []
