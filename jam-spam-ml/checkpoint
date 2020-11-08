@@ -1,2 +1,0 @@
-model_checkpoint_path: "trained_variables.ckpt"
-all_model_checkpoint_paths: "trained_variables.ckpt"
