@@ -1,7 +1,7 @@
 from __future__ import division
 from collections import Counter
 from multi_rake import Rake
-from utils import read_csv, fetch_data_from_github
+from utils import read_csv, fetch_data_from_github, import_local_dataset, fetch_from_remote
 from spam_keywords import get_keywords, get_spam_keywords
 
 import tensorflow.compat.v1 as tf
@@ -24,43 +24,43 @@ def main():
     ###################
 
     def import_data():
-        SPAM_PRS = read_csv("data/spam.csv")
-        HAM_PRS = read_csv("data/ham.csv")
+        spam_data, ham_data = import_local_dataset()
+        # csv_row -> [url, title, body, diffs, commit_messages, files_changed, docs_changed, commits, changes]
 
-        spam_pr_array = [
-            fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[10:15]
+        spam_text_corpus = [
+            [row[1], row[2], row[4]]  # [title, body, commit_messages]
+            for row in spam_data
         ]
-        ham_pr_array = [
-            fetch_data_from_github(pr_link) for pr_link in HAM_PRS[10:15]
+        ham_text_corpus = [
+            [row[1], row[2], row[4]]  # [title, body, commit_messages]
+            for row in ham_data
         ]
 
-        spam_text_corpus = [[
-            pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
-        ] for pr_feature in spam_pr_array]
-
-        ham_text_corpus = [[
-            pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
-        ] for pr_feature in ham_pr_array]
+        ## TO FETCH FROM REMOTE UNCOMMENT THE BLOCK BELOW
+        #
+        # spam_feature_array, ham_feature_array = fetch_from_remote(updateLocal=False)
+        # spam_text_corpus = [[
+        #     pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
+        # ] for pr_feature in spam_feature_array if type(pr_feature) is dict]
+        # ham_text_corpus = [[
+        #     pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
+        # ] for pr_feature in ham_feature_array if type(pr_feature) is dict]
 
         spam_keywords = get_spam_keywords(spam_text_corpus, ham_text_corpus)
+
+        print(spam_keywords)
 
         spam_feature_array = []
         ham_feature_array = []
 
         spam_feature_array.extend([[
             # pr_feature["url"],
-            pr_feature["files_changed"],
-            pr_feature["docs_changed"],
-            pr_feature["commits"],
-            pr_feature["changes"]]
-            for pr_feature in spam_pr_array])
+            pr_feature[5], pr_feature[6], pr_feature[7], pr_feature[8]]  # [files_changed, docs_changed, commits, changes]
+            for pr_feature in spam_data])
         ham_feature_array.extend([[
             # pr_feature["url"],
-            pr_feature["files_changed"],
-            pr_feature["docs_changed"],
-            pr_feature["commits"],
-            pr_feature["changes"]]
-            for pr_feature in ham_pr_array])
+            pr_feature[5], pr_feature[6], pr_feature[7], pr_feature[8]]  # [files_changed, docs_changed, commits, changes]
+            for pr_feature in ham_data])
 
         rake = Rake(max_words=1, min_freq=1)
 
@@ -279,8 +279,7 @@ def main():
     # How well do we perform on held-out test data?
     # print("final accuracy on test set: %s" %str(sess.run(accuracy_OP,
     #                                                      feed_dict={X: testX,
-    #                                                                 yGold: testY})))
-
+    #                                                                 yGold: testY}
     ##############################
     ### SAVE TRAINED VARIABLES ###
     ##############################
