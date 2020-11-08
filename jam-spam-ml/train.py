@@ -38,7 +38,7 @@ def count_freq(pat, txt):
     return res
 
 def main():
-
+  
     ###################
     ### IMPORT DATA ###
     ###################
@@ -291,7 +291,7 @@ def main():
                 print("step %d, training accuracy %g"%(i, train_accuracy))
                 print("step %d, cost %g"%(i, newCost))
                 print("step %d, change in cost %g"%(i, diff))
-
+                
                 # Plot progress to our two subplots
                 accuracyLine, = ax1.plot(epoch_values, accuracy_values)
                 costLine, = ax2.plot(epoch_values, cost_values)
