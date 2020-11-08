@@ -30,3 +30,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+checkpoint
+*.ckpt.*
+summary_logs/

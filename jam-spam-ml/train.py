@@ -96,24 +96,35 @@ def main():
                 num_spam_keywords += count_freq(keyword, text)
             ham_feature_array[i].append(num_spam_keywords)
 
-        labels_array = []
-        for spam_pr in spam_feature_array:
-            labels_array.append([1, 0])
+        TRAIN_SIZE = 35
+        TEST_SIZE = 15
 
-        for ham_pr in ham_feature_array:
-            labels_array.append([0, 1])
+        features_array = spam_feature_array[:TRAIN_SIZE] + ham_feature_array[:TRAIN_SIZE]
+        testing_array = spam_feature_array[-TEST_SIZE:] + ham_feature_array[-TEST_SIZE:]
+        
+        labels_array_train = []
+        for spam_pr in spam_feature_array[:TRAIN_SIZE]:
+            labels_array_train.append([1, 0])
 
-        features_array = spam_feature_array + ham_feature_array
+        for ham_pr in ham_feature_array[:TRAIN_SIZE]:
+            labels_array_train.append([0, 1])
+
+        labels_array_test = []
+        for spam_pr in spam_feature_array[-TEST_SIZE:]:
+            labels_array_test.append([1, 0])
+
+        for ham_pr in ham_feature_array[-TEST_SIZE:]:
+            labels_array_test.append([0, 1])
 
         print("loading training data")
         trainX = np.array(features_array)
-        trainY = np.array(labels_array)
+        trainY = np.array(labels_array_train)
         print(trainX)
         print(trainY)
 
         print("loading test data")
-        testX = np.zeros(0)
-        testY = np.zeros(0)
+        testX = np.array(testing_array)
+        testY = np.array(labels_array_test)
         return trainX,trainY,testX,testY
 
     trainX,trainY,testX,testY = import_data()

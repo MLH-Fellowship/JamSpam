@@ -3,3 +3,5 @@ python-dotenv
 requests
 multi-rake
 tensorflow
+matplotlib
+tensorflowjs
