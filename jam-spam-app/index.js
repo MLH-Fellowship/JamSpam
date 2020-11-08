@@ -11,6 +11,18 @@ module.exports = app => {
     return context.github.issues.createComment(issueComment)
   })
 
+  app.on('pull_request.opened', async context => {
+    app.log.info(context);
+    if (context.payload.pull_request.author_association == "FIRST_TIMER" || context.payload.pull_request.author_association == "MANNEQUIN" || context.payload.pull_request.author_association == "FIRST_TIME_CONTRIBUTOR" || context.payload.pull_request.author_association == "NONE"){
+      const prComment = context.issue({ body: 'This pull request might be spam. Further review needed.' })
+      return context.github.issues.createComment(prComment)
+    }
+    else{
+      const prComment = context.issue({ body: 'This pull is not spam. The contributor is legit.' })
+      return context.github.issues.createComment(prComment)
+    }
+  })
+
   // For more information on building apps:
   // https://probot.github.io/docs/
 
