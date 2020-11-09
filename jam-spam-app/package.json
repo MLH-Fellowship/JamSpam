@@ -18,6 +18,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@tensorflow/tfjs-node": "^2.7.0",
     "probot": "^10.9.3"
   },
   "devDependencies": {
