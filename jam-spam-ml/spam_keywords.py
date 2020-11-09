@@ -68,8 +68,8 @@ def get_spam_keywords(spam_features, ham_features):
     keywords_spam = rake.apply(text_spam.lower())
     keywords_ham = rake.apply(text_ham.lower())
 
-    print(keywords_ham)
-    print(keywords_spam)
+    # print(keywords_ham)
+    # print(keywords_spam)
 
     spam = [spam_keyword[0] for spam_keyword in keywords_spam[:30]]
     ham = [ham_keyword[0] for ham_keyword in keywords_ham[:30]]
