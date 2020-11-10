@@ -22,7 +22,7 @@ module.exports = app => {
   async function close (context, params) {
     const closeParams = Object.assign({}, params, {state: 'closed'})
   
-    return context.github.issues.edit(closeParams)
+    return context.github.issues.update(closeParams)
   }
 
   getStarted();
@@ -52,7 +52,7 @@ module.exports = app => {
       app.log.info(files_changed,commits,changes,docschange,spam_counted);
       console.log(files_changed,commits,changes,spam_counted,docschange);
       const prComment = context.issue({ body: 'This pull is not spam. The contributor is legit.' })
-      return context.github.issues.createComment(prComment)
+      return close(context, context.issue())
       }
       catch(e){
         app.log.info(e);
