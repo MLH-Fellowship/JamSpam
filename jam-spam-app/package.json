@@ -19,6 +19,8 @@
   },
   "dependencies": {
     "@tensorflow/tfjs-node": "^2.7.0",
+    "eol": "^0.9.1",
+    "node-fetch": "^2.6.1",
     "probot": "^10.9.3"
   },
   "devDependencies": {

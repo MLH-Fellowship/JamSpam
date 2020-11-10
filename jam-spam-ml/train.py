@@ -131,18 +131,11 @@ def main():
         testY = np.array(labels_array_test)
         return trainX,trainY,testX,testY
 
-<<<<<<< HEAD
-    spam_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[5:10]
-    ]
-    ham_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in HAM_PRS[5:10]
-    ]
-=======
+
     trainX,trainY,testX,testY = import_data()
     feature_count = trainX.shape[1]
     label_count = trainY.shape[1]
->>>>>>> 2ffebb27593d974c16835c2ec96e1f7968d25dd0
+
 
     model = keras.Sequential([
         # keras.layers.Flatten(input_shape=(5,)),
