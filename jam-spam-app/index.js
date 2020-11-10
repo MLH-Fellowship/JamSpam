@@ -67,7 +67,7 @@ module.exports = app => {
       });
       return context.github.issues.createComment(prComment);
     }
-    else if (["FIRST_TIMER", "MANNEQUIN", "FIRST_TIME_CONTRIBUTOR", "NONE", ""].includes(pull_request.author_association) || isSpam){
+    else if (["FIRST_TIMER", "MANNEQUIN", "FIRST_TIME_CONTRIBUTOR", "NONE", ""].includes(pull_request.author_association) && isSpam){
       // possibly spam - check for spam in classifier
       const prComment = context.issue({ 
         body: `Hmmm, something is fishy 🐠 here! We think this Pull Request does not meet the standards. 
