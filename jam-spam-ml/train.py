@@ -131,9 +131,11 @@ def main():
         testY = np.array(labels_array_test)
         return trainX,trainY,testX,testY
 
+
     trainX,trainY,testX,testY = import_data()
     feature_count = trainX.shape[1]
     label_count = trainY.shape[1]
+
 
     model = keras.Sequential([
         # keras.layers.Flatten(input_shape=(5,)),

@@ -1,18 +1,34 @@
 const { loadLayersModel, tensor } = require('@tensorflow/tfjs-node')
-
 tf = require('@tensorflow/tfjs-node')
+const spam_count = require('./checkspamcount')
+const fetchText = require('./fetchtext')
+const docschanged = require ('./docschanged')
 /**
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Application} app
  */
+
+
 module.exports = app => {
   // Your code here
   app.log.info('Yay, the app was loaded!')
 
+  var model = null;
+  var SPAM_THRESHOLD = 0.90;
+
   async function getStarted() {
-    const model = await loadLayersModel(`file://${process.cwd()}/model/model.json`);
-    var res = model.predict(tensor([[1, 0, 2, 4, 0], [2567, 490, 5, 260357, 0], [9, 0, 6, 627, 0]]))
-    app.log.debug(res.dataSync())
+    model = await loadLayersModel(`file://${process.cwd()}/model/model.json`);
+  }
+
+  async function close (context, params) {
+    const closeParams = Object.assign({}, params, {state: 'closed'})
+    return context.github.issues.update(closeParams)
+  }
+
+  async function predict (inputTensor) {
+    var res = await model.predict(inputTensor)
+    var spam_prob = res.dataSync()[0]
+    return spam_prob > SPAM_THRESHOLD
   }
 
   getStarted();
@@ -23,17 +39,42 @@ module.exports = app => {
   })
 
   app.on('pull_request.opened', async context => {
-    app.log.info(context);
+    // app.log.info(context);
     var pull_request = context.payload.pull_request;
-    if (["COLLABORATOR", "CONTRIBUTOR", "MEMBER", "OWNER"].includes(pull_request.author_association)){
-      // skip spam check - verified user
-      const prComment = context.issue({ body: 'This pull is not spam. The contributor is legit.' })
-      return context.github.issues.createComment(prComment)
+    try {
+      const files_changed =  parseInt(pull_request.changed_files);
+      const commits =  parseInt(pull_request.commits);
+      const title1 =  pull_request.title.toString();
+      const body1 =  pull_request.body.toString();
+      const changes =  parseInt(pull_request.additions) + parseInt(pull_request.deletions);
+      const {spam_counted, docschange} = await fetchText(pull_request.diff_url).then(diff => {
+        const textblob = title1 + body1 + diff
+        const spam_counted = spam_count(textblob)
+        const docschange = docschanged(diff)
+        return {spam_counted, docschange}
+      });  
+      var inputTensor = tensor([[files_changed, docschange, commits, changes, spam_counted]]);
+      // app.log.info(inputTensor);
     }
-    else if (["FIRST_TIMER", "MANNEQUIN", "FIRST_TIME_CONTRIBUTOR", "NONE", ""].includes(pull_request.author_association)){
+    catch(e){
+      app.log.error(`Error: ${e}`);
+    }
+    var isSpam = await predict(inputTensor);
+    if (["COLLABORATOR", "CONTRIBUTOR", "MEMBER", "OWNER"].includes(pull_request.author_association) || !isSpam){
+      // skip spam check - verified userconst files_changed = pull_request.changed_files;
+      const prComment = context.issue({ 
+        body: `Thanks for your Pull Request @${pull_request.user.login} 🙌 This seems like a legit 💯 contribution` 
+      });
+      return context.github.issues.createComment(prComment);
+    }
+    else if (["FIRST_TIMER", "MANNEQUIN", "FIRST_TIME_CONTRIBUTOR", "NONE", ""].includes(pull_request.author_association) || isSpam){
       // possibly spam - check for spam in classifier
-      const prComment = context.issue({ body: 'This pull request might be spam. Further review needed.' })
-      return context.github.issues.createComment(prComment)
+      const prComment = context.issue({ 
+        body: `Hmmm, something is fishy 🐠 here! We think this Pull Request does not meet the standards. 
+        Kindly refer to the Contributing Guidelines of the project. We look forward to your future contributions!` 
+      });
+      await context.github.issues.createComment(prComment)
+      return close(context, context.issue())
     }
   })
 
