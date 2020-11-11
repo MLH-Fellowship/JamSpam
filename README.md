@@ -53,6 +53,22 @@ If you have suggestions for how JamSpam could be improved, or want to report a b
 
 For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
+## Screenshots
+
+1. If you are a Collaborator, Contributor, Member, or Owner of the repository your pull request will never be flagged.
+![Ham PR](/Screenshots/ham.png)
+
+
+2. If you are a First Timer, Mannequin or First Time Contributor your pull requests will be checked.
+
+
+If the pull request is legit, it is not flagged
+![Ham PR](/Screenshots/ham2.png)
+
+
+If the pull request is suspected to be spam, it is marked as spam and closed.
+![Spam PR](/Screenshots/spam.png)
+
 ## License
 
 [MIT](LICENSE) © 2020 MLH Fellowship
