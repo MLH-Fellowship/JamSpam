@@ -49,7 +49,7 @@ module.exports = app => {
       const changes =  parseInt(pull_request.additions) + parseInt(pull_request.deletions);
       const {spam_counted, docschange} = await fetchText(pull_request.diff_url).then(diff => {
         const textblob = title1 + body1 + diff
-        const spam_counted = spam_count(textblob)
+        const spam_counted = spam_count(textblob.toLowerCase())
         const docschange = docschanged(diff)
         return {spam_counted, docschange}
       });  

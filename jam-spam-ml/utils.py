@@ -129,10 +129,10 @@ def fetch_from_remote(updateLocal: bool) -> (list, list):
     HAM_PRS = read_csv("data/ham.csv")
 
     spam_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in SPAM_PRS[0:2]
+        fetch_data_from_github(pr_link) for pr_link in SPAM_PRS
     ]
     ham_feature_array = [
-        fetch_data_from_github(pr_link) for pr_link in HAM_PRS[0:2]
+        fetch_data_from_github(pr_link) for pr_link in HAM_PRS
     ]
 
     spam_list_features = [[
@@ -156,4 +156,4 @@ def fetch_from_remote(updateLocal: bool) -> (list, list):
             writer = csv.writer(file)
             writer.writerows(ham_list_features)
 
-    return spam_feature_array, ham_feature_array
+    return spam_list_features, ham_list_features
