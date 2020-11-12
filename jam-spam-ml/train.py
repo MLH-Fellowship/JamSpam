@@ -7,10 +7,7 @@ from tensorflow import keras
 import tensorflowjs as tfjs
 import numpy as np
 import tarfile
-import os
-import matplotlib.pyplot as plt
-import time
-import re
+import os, time, re, random
 
 def print_array(ys):
     for xs in ys:
@@ -60,13 +57,13 @@ def main():
 
         ## TO FETCH FROM REMOTE UNCOMMENT THE BLOCK BELOW
         #
-        # spam_feature_array, ham_feature_array = fetch_from_remote(updateLocal=False)
+        # spam_data, ham_data = fetch_from_remote(updateLocal=True)
         # spam_text_corpus = [[
         #     pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
-        # ] for pr_feature in spam_feature_array if type(pr_feature) is dict]
+        # ] for pr_feature in spam_data if type(pr_feature) is dict]
         # ham_text_corpus = [[
         #     pr_feature["title"], pr_feature["body"], pr_feature["commit_messages"]
-        # ] for pr_feature in ham_feature_array if type(pr_feature) is dict]
+        # ] for pr_feature in ham_data if type(pr_feature) is dict]
 
         spam_keywords = get_spam_keywords(spam_text_corpus, ham_text_corpus)
 
@@ -88,36 +85,43 @@ def main():
 
         for i in range(len(spam_text_corpus)):
             num_spam_keywords = 0
-            text = re.sub('[^a-zA-Z0-9 \n\.]', '', get_keywords(spam_text_corpus[i]).lower())
+            text = re.sub('[^a-zA-Z0-9 \n\.]', ' ', get_keywords(spam_text_corpus[i]).lower())
             for keyword in spam_keywords:
                 num_spam_keywords += count_freq(keyword, text)
             spam_feature_array[i].append(num_spam_keywords)
 
         for i in range(len(ham_text_corpus)):
             num_spam_keywords = 0
-            text = re.sub('[^a-zA-Z0-9 \n\.]', '', get_keywords(ham_text_corpus[i]).lower())
+            text = re.sub('[^a-zA-Z0-9 \n\.]', ' ', get_keywords(ham_text_corpus[i]).lower())
             for keyword in spam_keywords:
                 num_spam_keywords += count_freq(keyword, text)
             ham_feature_array[i].append(num_spam_keywords)
 
-        TRAIN_SIZE = 40
-        TEST_SIZE = 10
+        random.shuffle(spam_feature_array)
+        random.shuffle(ham_feature_array)
 
-        features_array = spam_feature_array[:TRAIN_SIZE] + ham_feature_array[:TRAIN_SIZE]
-        testing_array = spam_feature_array[-TEST_SIZE:] + ham_feature_array[-TEST_SIZE:]
+        TRAIN_PARTITION = 80
+        TRAIN_SIZE_SPAM = int(len(spam_feature_array) * (TRAIN_PARTITION / 100))
+        TEST_SIZE_SPAM = len(spam_feature_array) - TRAIN_SIZE_SPAM
+        TRAIN_SIZE_HAM = int(len(ham_feature_array) * (TRAIN_PARTITION / 100))
+        TEST_SIZE_HAM = len(ham_feature_array) - TRAIN_SIZE_HAM
+
+
+        features_array = spam_feature_array[:TRAIN_SIZE_SPAM] + ham_feature_array[:TRAIN_SIZE_HAM]
+        testing_array = spam_feature_array[-TEST_SIZE_SPAM:] + ham_feature_array[-TEST_SIZE_HAM:]
         
         labels_array_train = []
-        for spam_pr in spam_feature_array[:TRAIN_SIZE]:
+        for spam_pr in spam_feature_array[:TRAIN_SIZE_SPAM]:
             labels_array_train.append([1])
 
-        for ham_pr in ham_feature_array[:TRAIN_SIZE]:
+        for ham_pr in ham_feature_array[:TRAIN_SIZE_HAM]:
             labels_array_train.append([0])
 
         labels_array_test = []
-        for spam_pr in spam_feature_array[-TEST_SIZE:]:
+        for spam_pr in spam_feature_array[-TEST_SIZE_SPAM:]:
             labels_array_test.append([1])
 
-        for ham_pr in ham_feature_array[-TEST_SIZE:]:
+        for ham_pr in ham_feature_array[-TEST_SIZE_HAM:]:
             labels_array_test.append([0])
 
         # print("loading training data")
@@ -149,12 +153,10 @@ def main():
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-    model.fit(trainX, trainY, epochs=250, batch_size=1)
+    model.fit(trainX, trainY, epochs=500, batch_size=1)
 
     test_loss, test_acc = model.evaluate(testX, testY)
     print('Test accuracy:', test_acc)
-
-    print(model.predict(testX), testX)
 
     tfjs.converters.save_keras_model(model, f'model/{int(time.time())}')
 
